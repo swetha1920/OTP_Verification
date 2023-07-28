@@ -1,36 +1,68 @@
+# Python intern at SYNC INTERN'S
+# Task 2: OTP Verification
+
+
 import random
 import smtplib
-
-digits = random.randint(100000, 999999)
-# print(digits)
-digits = str(digits)
+from tkinter import *
 
 
-def otp_verify(reciever_email, digits):
-    sender_email = "theemailadress@gmail.com"
-    sender_password = "the_password_of_emailID"
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(user=sender_email, password=sender_password)
-        server.sendmail(from_addr=sender_email, to_addrs=reciever_email, msg=f"Otp is sent to your email {digits}")
-        server.close()
-        print("OTP sent")
-    except Exception as e:
-        print("Some error ")
-        print(str(e))
-    finally:
-        server.quit()
+def generateOTP():
+    randomCode = ''.join(str(random.randint(0, 9)) for i in range(6))
+    return randomCode
 
 
-r_email = input("Enter your email : ")
-otp_verify(r_email,digits)
-otp = input("Please enter the otp: ")
+sender = 'revaldosan@gmail.com'
+password = 'hjrrfffuktiodieu'
+code = generateOTP()
 
-if digits == otp:
-    print("OTP VERIFIED")
-else:
-    if digits != otp:
-        print("Wrong otp")
+
+def connectingSender():
+    receiver = receiverMail.get()
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(sender, password)
+    sendingMail(receiver, server)
+
+
+def sendingMail(receiver, server):
+    msg = 'Hello! \n This is your OTP is ' + code
+    server.sendmail(sender, receiver, msg)
+    server.quit()
+
+
+def checkOTP():
+    if code == codeEntry.get():
+        accept = Label(otp, text='Successful Verification!', fg='green', font=('Arial', 20))
+        accept.place(x=230, y=350)
     else:
-        print("Error in email. Check Email!")
+        refuse = Label(otp, text='Unsuccessful Verification!', fg='red', font=('Arial', 20))
+        refuse.place(x=230, y=350)
+
+
+otp = Tk()
+otp.title('OTP Verification')
+otp.geometry('750x400')
+otp.config(bg='#FFF1DC')
+
+mailMsg = Label(otp, text="E-Mail", justify=LEFT, bg='#FFF1DC', font=("Arial", 16))
+mailMsg.place(x=15, y=40)
+
+receiverMail = Entry(otp, text='mail.gmail.com', width=35, font=("Arial", 20), borderwidth=0)
+receiverMail.place(x=100, y=40)
+receiverM = StringVar()
+
+sendOTP = Button(otp, text="send OTP", width=8, height=1, font=("Arial", 20), borderwidth=0, bg="#AA5656", fg="black", command=connectingSender)
+sendOTP.place(x=280, y=100)
+
+otpMsg = Label(otp, text="OTP", bg='#FFF1DC', font=('Arial', 16))
+otpMsg.place(x=15, y=210)
+
+codeEntry = Entry(otp, width=6, font=("Arial", 20), borderwidth=0)
+codeEntry.place(x=100, y=210)
+
+verify = Button(otp, text="Verify", width=8, height=1, font=("Arial", 20), borderwidth=0, bg="#AA5656", fg="black",
+                command=checkOTP)
+verify.place(x=280, y=280)
+
+otp.mainloop()
